@@ -236,5 +236,3 @@ Chủ tài khoản: Phan Tấn Đạt
 ### 📄 License
 
 Source code được công khai để cộng đồng có thể xem và đóng góp.
-
-Nếu bạn muốn sử dụng, sửa đổi hoặc phân phối lại project, vui lòng kiểm tra file `LICENSE` của repository để biết các điều khoản áp dụng.
