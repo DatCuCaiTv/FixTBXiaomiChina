@@ -1,0 +1,94 @@
+========================================================
+  TOOL FIX THÔNG BÁO XIAOMI
+  App được tạo bởi Phan Tấn Đạt
+  STK ủng hộ: MB Bank 0982414903
+========================================================
+
+YÊU CẦU
+-------
+- Windows 10 / 11. KHÔNG cần cài adb, KHÔNG cần cài .NET — mở tool là chạy.
+- Điện thoại Xiaomi/Redmi/POCO, nhất là ROM NỘI ĐỊA TRUNG QUỐC.
+- Cáp dữ liệu + đã bật "Gỡ lỗi USB" trên máy.
+
+CÁCH DÙNG (4 bước)
+------------------
+1. Mở ToolFixThongBaoXiaomi.exe → tool tự KIỂM TRA KẾT NỐI trước.
+   Chưa cắm máy thì nó chặn ở màn hình hướng dẫn, không cho vào.
+2. Trên điện thoại bấm "Cho phép" ở hộp thoại gỡ lỗi USB (tick "Luôn cho phép").
+   Kết nối xong tool hiện: tên máy + Android + bản HyperOS.
+3. Bấm QUÉT ỨNG DỤNG → hiện danh sách app (có ô Tìm kiếm).
+   Chọn 1 trong 2 chế độ:
+   • "Tự chọn ứng dụng": tick từng app, hoặc dùng nút nhanh
+     "Chọn app chat / mạng xã hội" và "Chọn app ví / ngân hàng".
+   • "Toàn bộ ứng dụng đã quét": fix hết (có hỏi xác nhận).
+4. Bấm BẮT ĐẦU FIX THÔNG BÁO → xem bảng kết quả → KHỞI ĐỘNG LẠI ĐIỆN THOẠI.
+
+TOOL LÀM GÌ TRÊN MÁY (mỗi app được chọn)
+----------------------------------------
+1. TỰ KHỞI ĐỘNG  → đặt appops 10053 = allow  (ĐÂY LÀ OP THẬT của HyperOS 3 / Android 16,
+   đúng cái mà trang Cài đặt → Quyền → Tự khởi động đọc) và appops 10008 = allow
+   (op cũ của MIUI 12-14, để tương thích máy đời trước).
+2. PIN KHÔNG HẠN CHẾ → thêm app vào danh sách miễn trừ Doze.
+3. STANDBY BUCKET = active → không bị đẩy xuống nhóm RARE/RESTRICTED.
+4. GỠ CHẶN THÔNG BÁO → POST_NOTIFICATION = allow (cả cấp UID).
+Sau đó tool TẮT trang Cài đặt (com.miui.securitycenter) để MIUI đọc lại trạng thái,
+nên bạn mở lại Cài đặt → Tự khởi động là thấy app đã được bật.
+
+QUAN TRỌNG — vì sao trước đây bật mà Cài đặt vẫn hiện "tắt"
+-----------------------------------------------------------
+- HyperOS 3 không còn dùng appops 10008 cho Tự khởi động nữa, mà dùng appops 10053.
+- Nhiều tool/script cũ chỉ set 10008 → máy chạy được nhưng trang Cài đặt vẫn hiện TẮT.
+- Tool này set CẢ 10053 (chính) + 10008 (dự phòng) và tự đọc lại để xác nhận [x]/[ ].
+  (Đã kiểm chứng thực tế trên Xiaomi 17 Pro – HyperOS 3.0.319.0: đặt 10053 = allow thì
+   app xuất hiện ngay trong danh sách "x apps can autostart".)
+
+KHÔNG cần root. Không mất dữ liệu. Không sửa file hệ thống.
+
+MUỐN HOÀN TÁC
+--------------
+  adb shell cmd appops set <package> 10053 ignore      (tắt tự khởi động)
+  adb shell cmd appops set <package> 10008 ignore
+  adb shell dumpsys deviceidle whitelist -<package>    (bỏ pin miễn trừ)
+  adb shell am set-standby-bucket <package> rare
+
+LƯU Ý
+-----
+- Nên fix cho app nhắn tin / mạng xã hội / ví ngân hàng. Fix TOÀN BỘ sẽ tốn pin hơn.
+- Sau khi fix nên khởi động lại máy.
+- Vài app (Grab, ChatGPT, VNeID...) có thể bị chặn ở tầng hệ thống (importance=NONE);
+  khi đó phải bật tay: Cài đặt → Thông báo → [app] → bật lại.
+- Nút "ADB…": nếu máy tính đã có adb ở chỗ khác thì chọn tay. Tool luôn thử lần lượt:
+  adb bạn chọn → adb nhúng sẵn trong tool → adb tự dò (Downloads\platform-tools,
+  Android SDK, PATH, cạnh file exe). Màn hình kiểm tra in ra từng adb đã thử + kết quả.
+- Máy tính chưa có driver ADB của Xiaomi thì Windows Update thường tự cài khi cắm cáp.
+  Nếu tool báo không thấy máy dù đã bật gỡ lỗi USB: đổi cáp/sang cổng USB khác,
+  hoặc chọn adb khác bằng nút "ADB…".
+
+VỀ VIỆC "KHÔNG AI SOI ĐƯỢC MÃ NGUỒN"
+------------------------------------
+- adb.exe + ảnh nền + toàn bộ CHUỖI LỆNH đều được mã hoá AES-256 trong exe: mở bằng
+  strings/hex sẽ không thấy gì.
+- Khoá bị chẻ đôi, một nửa đảo ngược, ghép lại lúc chạy; có chống gỡ lỗi (anti-debug);
+  biên dịch /optimize+, không kèm .pdb; các lớp lõi đặt tên vô nghĩa (Q2, K4, V).
+- Giới hạn thật: exe .NET vẫn có thể bị dịch ngược bởi người rất rành. Muốn chống
+  tuyệt đối phải viết bằng C++ native (cần Visual Studio C++ ~3GB).
+
+FILE TRONG THƯ MỤC
+------------------
+build\ToolFixThongBaoXiaomi.exe   - TOOL CHÍNH (9,6 MB, copy đi đâu cũng chạy)
+build\MakeVault.exe               - bộ mã hoá tài nguyên (build time)
+src\Program.cs  MainForm.cs       - điểm vào + giao diện
+src\Adb.cs (Q2)  Fixer.cs (K4)    - lõi: nạp adb + quét + fix
+src\Vault.cs  VaultData.g.cs      - giải mã + dữ liệu đã mã hoá (tự sinh)
+tools\MakeVault.cs                - nguồn bộ mã hoá
+assets\bg.png  assets\adb\        - ảnh nền + adb gốc (bị mã hoá khi build)
+build.ps1                         - build lại toàn bộ
+
+TỰ BUILD LẠI
+------------
+powershell -ExecutionPolicy Bypass -File build.ps1
+
+Tham số ẩn để test:
+  ToolFixThongBaoXiaomi.exe --demo        xem giao diện với dữ liệu mẫu
+  ToolFixThongBaoXiaomi.exe --check       kiểm tra nhận diện thiết bị + quét app
+  ToolFixThongBaoXiaomi.exe --fix <pkg>   fix 1 app rồi in trạng thái op ra file
